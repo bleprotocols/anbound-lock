@@ -1,6 +1,6 @@
 This repository contains the anbound-lock firmware project. It's an open source project that contains firmware to turn any anbound lock into a timer lock.
 It contains code from https://github.com/AustinHaigh/CCLoader-RPi and https://github.com/JimGeek/TI-CC2541-BLE
-An extra command is included, the CCReader command that lets you read firmware from a lock. I've also included a binary file that contains the original firmware,
+An extra command is included in CCLoader: -f . It lets you read firmware from a lock. I've also included a binary file that contains the original firmware,
 in case you want to restore your lock to the normal firmware.
 
 What do you need to build and use this:
@@ -18,8 +18,9 @@ How to use it:
   - Start raspberry pi and clone this git repository
   - Install sdcc: apt-get install sdcc
   - Run make in the git repository folder: make all
-  - use CCLoader to write the timer_lock.bin to the device
-  
+  - Clean up residue: make clean
+  - use CCLoader to write the timer_lock.bin to the device : ./CCLoader --DC=21 --DD=20 --RESET=26 timer_lock.bin
+
 Once the firmware is on the lock, reassemble it. With the lock assembled, open the shackle. Both red and blue lights will come on, then
 the lock will emit blue light from the button. Press one time for each 10 minutes you want the lock to stay locked. So one press = 10 minutes, two = 20, etc.
 After a few seconds a red light will come on. Press one time for each hour you want the lock to stay locked. So one press = 1 hour, two = 2 hours etc.

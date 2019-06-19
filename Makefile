@@ -3,8 +3,8 @@ CFLAGS=--model-medium --xram-loc 0x0000 --xram-size 0x2000 --iram-size 0x0100 -I
 AS=sdas8051
 ASFLAGS=-glos -p
 
-LIBS=delay.rel util.rel
-
+LIBS=util.rel pm_sleep.rel
+BIN=timer_lock.bin
 
 %.rel: %.c
 	$(CC) $(CFLAGS) -c $? -o $@
@@ -20,9 +20,5 @@ LIBS=delay.rel util.rel
 clean:
 	rm  *.asm *.hex *.lst *.map *.mem *.rel *.lk *.rst *.sym *.adb *.cdb *.omf -f
 
-flash:
-	cc-tool -f -e -w $(HEX)
-
-all: timer_lock.bin
+all: ${LIBS} ${BIN}
 	gcc CCLoader.c -std=c99 -lm -o CCLoader
-	gcc CCReader.c -std=c99 -lm -o CCReader
