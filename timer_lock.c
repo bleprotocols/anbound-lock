@@ -68,9 +68,9 @@ void blink_blue()
 {
     P0DIR |= 0x20;
     P0 |= 0x20;
-    pm_sleep(1, 400);
+    pm_sleep(1, 200);
     P0 &= ~0x20;
-    pm_sleep(1, 600);
+    pm_sleep(1, 300);
     P0 |= 0x20;
     P0DIR &= ~0X20;
 }
@@ -79,9 +79,9 @@ void blink_red()
 {
     P0DIR |= 0x10;
     P0 |= 0x10;
-    pm_sleep(1, 400);
+    pm_sleep(1, 200);
     P0 &= ~0x10;
-    pm_sleep(1, 600);
+    pm_sleep(1, 300);
     P0 |= 0x10;
     P0DIR &= ~0x10;
 }
@@ -128,7 +128,8 @@ int main(void)
         {
             if (shackle_closed())
             {
-                pm_sleep(0, 2000);
+                open_lock();
+                pm_sleep(0, 1000);
 
                 for (i = 0; i < hours; i++)
                     blink_red();
@@ -138,7 +139,7 @@ int main(void)
 
                 pm_sleep(0, 2000);
 
-                for (i = 0; i < 50; i++)
+                for (i = 0; i < 70; i++)
                 {
                     switch (i % 5)
                     {
@@ -159,7 +160,7 @@ int main(void)
                             break;
                     }
 
-                    pm_sleep(1, 100);
+                    pm_sleep(1, 30);
                 }
 
                 blue_off();
@@ -184,7 +185,13 @@ int main(void)
                         }
                     }
 
-                    open_lock();
+                    minutes = 0;
+                    hours = 0;
+
+                    for(i = 0; i < 10; i++){
+                      open_lock();
+                      pm_sleep(0,10000);
+                    }
                 }
             }
             else
@@ -196,7 +203,7 @@ int main(void)
                 hours = 0;
                 minutes = 0;
 
-                for (i = 0; i < 50; i++)
+                for (i = 0; i < 90; i++)
                 {
                     if (button_pressed())
                     {
@@ -211,7 +218,7 @@ int main(void)
                 blue_off();
                 red_on();
 
-                for (i = 0; i < 50; i++)
+                for (i = 0; i < 90; i++)
                 {
                     if (button_pressed())
                     {
