@@ -29,4 +29,4 @@ After this the lights will blink rapidly for a few seconds, while they blink you
 There is no way to open it but to wait.
 
 
-  
+Notice: this is free software. Covered by the GPL. You are free to use it as you see fit, free to modify it as you see fit, and sell it as you see fit. Anyone who thinks otherwise can kiss my ass.
