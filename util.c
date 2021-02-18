@@ -9,11 +9,14 @@ void isr_wdt() __interrupt(17) {}
 
 void slow_clockspeed()
 {
-    OSC32K = 1; //use the internal 32 bit internal clock when in 32khz mode
-    OSC = 1; //use the internal 16mhz oscillator NOW
-    CLKSPD_0 = 1; //250khz clock
-    CLKSPD_1 = 1;
-    CLKSPD_2 = 1;
+    unsigned long int i=0;
+    //switch to 32mhz crystal to stabilize 32khz xosc
+    CLKCON = (CLKCON & 0x80) ;    
+    while ( (CLKCONSTA & ~0x80) != 0 ); 
+
+    //switch to 16mhz clock with divider to 250khz
+    CLKCON = (CLKCON & 0x80) | 0x49; 
+    while ((CLKCONSTA & ~0x80) != 0x49 );
 }
 
 uint16 rnd()
