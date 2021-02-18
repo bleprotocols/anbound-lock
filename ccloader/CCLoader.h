@@ -70,8 +70,7 @@
 /******************************************************************************
  VARIABLES*/
 //! DUP DMA descriptor
-const unsigned char dma_desc_0[8] =
-{
+const unsigned char dma_desc_0[8] = {
     // Debug Interface -> Buffer
     HIBYTE(DUP_DBGDATA),    // src[15:8]
     LOBYTE(DUP_DBGDATA),    // src[7:0]
@@ -84,8 +83,7 @@ const unsigned char dma_desc_0[8] =
 };
 
 //! DUP DMA descriptor
-const unsigned char dma_desc_1[8] =
-{
+const unsigned char dma_desc_1[8] = {
     // Buffer -> Flash controller
     HIBYTE(ADDR_BUF0),  // src[15:8]
     LOBYTE(ADDR_BUF0),  // src[7:0]
@@ -98,13 +96,12 @@ const unsigned char dma_desc_1[8] =
 };
 
 // program arguments
-struct args
-{
+struct args {
     int DD;
     int DC;
     int RESET;
     int verify;
     int retries;
-    char *fName;
+    char * fName;
     int read;
 };

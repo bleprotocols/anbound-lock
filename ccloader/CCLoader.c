@@ -30,8 +30,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
 int cachedFiles[32] = { 0 };
 
-struct args args =
-{
+struct args args = {
     .DC = 2,
     .DD = 3,
     .RESET = 4,
@@ -51,10 +50,9 @@ int unexportPin(int pin)
 {
     char buf[16];
     const char path[] = "/sys/class/gpio/unexport";
-    FILE *pFile = fopen(path, "w");
+    FILE * pFile = fopen(path, "w");
 
-    if (!pFile)
-    {
+    if (!pFile) {
         char err[64];
         sprintf(err, "Error opening file %s", path);
         perror(err);
@@ -63,8 +61,7 @@ int unexportPin(int pin)
 
     sprintf(buf, "%d", pin);
 
-    if (!fwrite(buf, strlen(buf), 1, pFile))
-    {
+    if (!fwrite(buf, strlen(buf), 1, pFile)) {
         char err[64];
         sprintf(err, "Error writing file %s", path);
         perror(err);
@@ -80,10 +77,9 @@ int exportPin(int pin)
 {
     char buf[16];
     const char path[] = "/sys/class/gpio/export";
-    FILE *pFile = fopen(path, "w");
+    FILE * pFile = fopen(path, "w");
 
-    if (!pFile)
-    {
+    if (!pFile) {
         char err[64];
         sprintf(err, "Error opening file %s", path);
         perror(err);
@@ -92,8 +88,7 @@ int exportPin(int pin)
 
     sprintf(buf, "%d", pin);
 
-    if (!fwrite(buf, strlen(buf), 1, pFile))
-    {
+    if (!fwrite(buf, strlen(buf), 1, pFile)) {
         char err[64];
         sprintf(err, "Error writing file %s", path);
         perror(err);
@@ -107,14 +102,12 @@ int exportPin(int pin)
 
 int digitalWrite(int pin, const char state)
 {
-    if (cachedFiles[pin] == 0)
-    {
+    if (cachedFiles[pin] == 0) {
         char path[64];
         sprintf(path, "/sys/class/gpio/gpio%d/value", pin);
         cachedFiles[pin] = open(path, O_RDWR);
 
-        if (cachedFiles[pin] == -1)
-        {
+        if (cachedFiles[pin] == -1) {
             char err[64];
             sprintf(err, "Error opening file %s", path);
             perror(err);
@@ -122,8 +115,7 @@ int digitalWrite(int pin, const char state)
         }
     }
 
-    if (!write(cachedFiles[pin], &state, 1))
-    {
+    if (!write(cachedFiles[pin], &state, 1)) {
         char err[64];
         sprintf(err, "Error writing to pin %d", pin);
         perror(err);
@@ -135,27 +127,24 @@ int digitalWrite(int pin, const char state)
 
 const char digitalRead(int pin)
 {
-    if (cachedFiles[pin] == 0)
-    {
+    if (cachedFiles[pin] == 0) {
         char path[64];
         sprintf(path, "/sys/class/gpio/gpio%d/value", pin);
         cachedFiles[pin] = open(path, O_RDWR);
 
-        if (cachedFiles[pin] == -1)
-        {
+        if (cachedFiles[pin] == -1) {
             char err[64];
             sprintf(err, "Error opening file %s", path);
             perror(err);
             return -1;
         }
-    }
-    else
+    } else {
         lseek(cachedFiles[pin], 0, SEEK_SET);
+    }
 
     char output;
 
-    if (read(cachedFiles[pin], &output, 1) != 1)
-    {
+    if (read(cachedFiles[pin], &output, 1) != 1) {
         char err[64];
         sprintf(err, "Error reading pin %d", pin);
         perror(err);
@@ -165,23 +154,21 @@ const char digitalRead(int pin)
     return output;
 }
 
-int pinMode(int pin, const char *mode)
+int pinMode(int pin, const char * mode)
 {
     char path[64];
-    FILE *file;
+    FILE * file;
     sprintf(path, "/sys/class/gpio/gpio%d/direction", pin);
     file = fopen(path, "w");
 
-    if (!file)
-    {
+    if (!file) {
         char err[64];
         sprintf(err, "Error opening file %s", path);
         perror(err);
         return -1;
     }
 
-    if (!fwrite(mode, strlen(mode), 1, file))
-    {
+    if (!fwrite(mode, strlen(mode), 1, file)) {
         char err[64];
         sprintf(err, "Error writing file %s", path);
         perror(err);
@@ -203,16 +190,15 @@ void write_debug_byte(unsigned char data)
 {
     unsigned char i;
 
-    for (i = 0; i < 8; i++)
-    {
+    for (i = 0; i < 8; i++) {
         // Set clock high and put data on DD line
         digitalWrite(args.DC, HIGH);
 
-        if (data & 0x80)
+        if (data & 0x80) {
             digitalWrite(args.DD, HIGH);
-
-        else
+        } else {
             digitalWrite(args.DD, LOW);
+        }
 
         data <<= 1;
         digitalWrite(args.DC, LOW); // set clock low (DUP capture flank)
@@ -229,13 +215,13 @@ unsigned char read_debug_byte(void)
     unsigned char i;
     unsigned char data = 0x00;
 
-    for (i = 0; i < 8; i++)
-    {
+    for (i = 0; i < 8; i++) {
         digitalWrite(args.DC, HIGH);    // DC high
         data <<= 1;
 
-        if (HIGH == digitalRead(args.DD))
+        if (HIGH == digitalRead(args.DD)) {
             data |= 0x01;
+        }
 
         digitalWrite(args.DC, LOW); // DC low
     }
@@ -255,8 +241,7 @@ unsigned char wait_dup_ready(void)
     // DUP pulls DD low when ready
     unsigned int count = 0;
 
-    while ((HIGH == digitalRead(args.DD)) && count < 16)
-    {
+    while ((HIGH == digitalRead(args.DD)) && count < 16) {
         // Clock out 8 bits before checking if DD is low again
         read_debug_byte();
         count++;
@@ -274,9 +259,8 @@ unsigned char wait_dup_ready(void)
 * @param    num_cmd_bytes   The number of data bytes (input to DUP) [0-3]
 * @return   Data returned by command
 ******************************************************************************/
-unsigned char
-debug_command(unsigned char cmd, unsigned char *cmd_bytes,
-              unsigned short num_cmd_bytes)
+unsigned char debug_command(unsigned char cmd, unsigned char * cmd_bytes,
+                            unsigned short num_cmd_bytes)
 {
     unsigned short i;
     unsigned char output = 0;
@@ -286,8 +270,9 @@ debug_command(unsigned char cmd, unsigned char *cmd_bytes,
     write_debug_byte(cmd);
 
     // Send bytes
-    for (i = 0; i < num_cmd_bytes; i++)
+    for (i = 0; i < num_cmd_bytes; i++) {
         write_debug_byte(cmd_bytes[i]);
+    }
 
     // Set DD as input
     pinMode(args.DD, INPUT);
@@ -346,8 +331,7 @@ unsigned char read_chip_id(void)
     delay(1);
 
     // Wait for data to be ready
-    if (wait_dup_ready() == 1)
-    {
+    if (wait_dup_ready() == 1) {
         // Read ID and revision
         id = read_debug_byte(); // ID
         read_debug_byte();  // Revision (discard)
@@ -365,7 +349,7 @@ unsigned char read_chip_id(void)
 * @param    num_bytes   The number of input bytes
 * @return   None.
 ******************************************************************************/
-void burst_write_block(unsigned char *src, unsigned short num_bytes)
+void burst_write_block(unsigned char * src, unsigned short num_bytes)
 {
     unsigned short i;
     // Make sure DD is output
@@ -373,8 +357,9 @@ void burst_write_block(unsigned char *src, unsigned short num_bytes)
     write_debug_byte(CMD_BURST_WRITE | HIBYTE(num_bytes));
     write_debug_byte(LOBYTE(num_bytes));
 
-    for (i = 0; i < num_bytes; i++)
+    for (i = 0; i < num_bytes; i++) {
         write_debug_byte(src[i]);
+    }
 
     // Set DD as input
     pinMode(args.DD, INPUT);
@@ -398,11 +383,9 @@ void chip_erase(void)
     debug_command(CMD_CHIP_ERASE, 0, 0);
 
     // Wait for status bit 7 to go low
-    do
-    {
+    do {
         status = debug_command(CMD_READ_STATUS, 0, 0);
-    }
-    while ((status & STATUS_CHIP_ERASE_BUSY_BM));
+    } while ((status & STATUS_CHIP_ERASE_BUSY_BM));
 }
 
 /**************************************************************************//**
@@ -412,9 +395,8 @@ void chip_erase(void)
 * @param    num_bytes   Number of bytes to write
 * @return   None.
 ******************************************************************************/
-void
-write_xdata_memory_block(unsigned short address,
-                         const unsigned char *values, unsigned short num_bytes)
+void write_xdata_memory_block(unsigned short address,
+                              const unsigned char * values, unsigned short num_bytes)
 {
     unsigned char instr[3];
     unsigned short i;
@@ -424,8 +406,7 @@ write_xdata_memory_block(unsigned short address,
     instr[2] = LOBYTE(address);
     debug_command(CMD_DEBUG_INSTR_3B, instr, 3);
 
-    for (i = 0; i < num_bytes; i++)
-    {
+    for (i = 0; i < num_bytes; i++) {
         // MOV A, values[i]
         instr[0] = 0x74;
         instr[1] = values[i];
@@ -488,7 +469,7 @@ unsigned char read_xdata_memory(unsigned short address)
 * @param    values      Pointer to destination buffer.
 * @return   None.
 ******************************************************************************/
-unsigned int read_flash_memory_block(int noisy, unsigned char bank, unsigned short flash_addr, int num_bytes, unsigned char *values)
+unsigned int read_flash_memory_block(int noisy, unsigned char bank, unsigned short flash_addr, int num_bytes, unsigned char * values)
 {
     unsigned char instr[3];
     int i;
@@ -502,20 +483,23 @@ unsigned int read_flash_memory_block(int noisy, unsigned char bank, unsigned sho
     instr[2] = LOBYTE(xdata_addr);
     debug_command(CMD_DEBUG_INSTR_3B, instr, 3);
 
-    for (i = 0; i < num_bytes; i++)
-    {
+    for (i = 0; i < num_bytes; i++) {
         // 3. Move value pointed to by DPTR to accumulator (MOVX A, @DPTR)
         instr[0] = 0xE0;
         values[i] = debug_command(CMD_DEBUG_INSTR_1B, instr, 1);
         end_count += values[i] == 0xff;
 
-        if (values[i] != 0xff) end_count = 0;
+        if (values[i] != 0xff) {
+            end_count = 0;
+        }
 
-        if (end_count >= 16 && (i + 1) % 512 == 0)
+        if (end_count >= 16 && (i + 1) % 512 == 0) {
             return i + 1;
+        }
 
-        if (i % 100 == 0 && (noisy > 0))
+        if (i % 100 == 0 && (noisy > 0)) {
             printf("Read byte %u out of %u from bank %u : %u \n", i, num_bytes, bank, values[i]);
+        }
 
         // 4. Increment data pointer (INC DPTR)
         instr[0] = 0xA3;
@@ -533,9 +517,8 @@ unsigned int read_flash_memory_block(int noisy, unsigned char bank, unsigned sho
 * @param    num_bytes   Number of bytes to transfer [4-1024]
 * @return   None.
 ******************************************************************************/
-void
-write_flash_memory_block(unsigned char *src, unsigned long start_addr,
-                         unsigned short num_bytes)
+void write_flash_memory_block(unsigned char * src, unsigned long start_addr,
+                              unsigned short num_bytes)
 {
     // 1. Write the 2 DMA descriptors to RAM
     write_xdata_memory_block(ADDR_DMA_DESC_0, dma_desc_0, 8);
@@ -577,44 +560,46 @@ void RunDUP(void)
 
 int ProgrammerInit(void)
 {
-    if (pinMode(args.DD, OUTPUT))
+    if (pinMode(args.DD, OUTPUT)) {
         return -1;
+    }
 
-    if (pinMode(args.DC, OUTPUT))
+    if (pinMode(args.DC, OUTPUT)) {
         return -1;
+    }
 
-    if (pinMode(args.RESET, OUTPUT))
+    if (pinMode(args.RESET, OUTPUT)) {
         return -1;
+    }
 
-    if (digitalWrite(args.DD, LOW))
+    if (digitalWrite(args.DD, LOW)) {
         return -1;
+    }
 
-    if (digitalWrite(args.DC, LOW))
+    if (digitalWrite(args.DC, LOW)) {
         return -1;
+    }
 
-    if (digitalWrite(args.RESET, HIGH))
+    if (digitalWrite(args.RESET, HIGH)) {
         return -1;
+    }
 
     return 0;
 }
 
-int
-flash_block(FILE *pFile, unsigned char *rxBuf, unsigned char Verify,
-            unsigned int addr, int retries)
+int flash_block(FILE * pFile, unsigned char * rxBuf, unsigned char Verify,
+                unsigned int addr, int retries)
 {
     write_flash_memory_block(rxBuf, addr, 512); // src, address, count
 
-    if (Verify)
-    {
+    if (Verify) {
         unsigned char bank = addr / (512 * 16);
         unsigned int offset = (addr % (512 * 16)) * 4;
         unsigned char read_data[512];
         read_flash_memory_block(0, bank, offset, 512, read_data);   // Bank, address, count, dest.
 
-        for (unsigned int i = 0; i < 512; i++)
-        {
-            if (read_data[i] != rxBuf[i])
-            {
+        for (unsigned int i = 0; i < 512; i++) {
+            if (read_data[i] != rxBuf[i]) {
                 fprintf(stderr,
                         "\nError verifying byte %d of block %d, trying again.\n",
                         i, addr / 128);
@@ -622,8 +607,9 @@ flash_block(FILE *pFile, unsigned char *rxBuf, unsigned char Verify,
                 if (retries)
                     return flash_block(pFile, rxBuf, Verify,
                                        addr, retries - 1);
-                else
+                else {
                     return -1;
+                }
             }
         }
     }
@@ -631,7 +617,7 @@ flash_block(FILE *pFile, unsigned char *rxBuf, unsigned char Verify,
     return 0;
 }
 
-void flash_chip(FILE *pFile, long fSize, unsigned char Verify)
+void flash_chip(FILE * pFile, long fSize, unsigned char Verify)
 {
     printf("Flashing firmware...");
     fflush(stdout);
@@ -639,10 +625,8 @@ void flash_chip(FILE *pFile, long fSize, unsigned char Verify)
     unsigned char rxBuf[514];
     unsigned int addr = 0;
 
-    for (int i = 0; i < fSize / 512; i++)
-    {
-        if (fread(rxBuf, 512, 1, pFile) == 0)
-        {
+    for (int i = 0; i < fSize / 512; i++) {
+        if (fread(rxBuf, 512, 1, pFile) == 0) {
             perror("Error reading from file");
             return;
         }
@@ -651,17 +635,16 @@ void flash_chip(FILE *pFile, long fSize, unsigned char Verify)
                i, 100 * i * 512 / fSize);
         fflush(stdout);
 
-        if (flash_block(pFile, rxBuf, Verify, addr, 10))
+        if (flash_block(pFile, rxBuf, Verify, addr, 10)) {
             return;
+        }
 
         addr += (unsigned int)128;
     }
 
     // add 0xFF to the end of the last block if neccessary
-    if (fSize % 512)
-    {
-        if (fread(rxBuf, fSize % 512, 1, pFile) == 0)
-        {
+    if (fSize % 512) {
+        if (fread(rxBuf, fSize % 512, 1, pFile) == 0) {
             perror("Error reading from file");
             return;
         }
@@ -678,154 +661,153 @@ void flash_chip(FILE *pFile, long fSize, unsigned char Verify)
                     "\nError verifying block %d, trying again.\n",
                     fSize / 512 + 1);
 
-        if (!retries)
+        if (!retries) {
             return;
+        }
     }
 
     printf("\nFlashing has completed successfully.\n");
 }
 
-error_t arg_parser(int key, char *arg, struct argp_state *state)
+error_t arg_parser(int key, char * arg, struct argp_state * state)
 {
-    char *endptr;
+    char * endptr;
     int val;
     error_t err = 0;
 
-    switch (key)
-    {
-        case 'v':
-            args.verify = 0;
-            printf("Verify disabled\n");
+    switch (key) {
+    case 'v':
+        args.verify = 0;
+        printf("Verify disabled\n");
+        break;
+
+    case 'f':
+        args.read = 1;
+        printf("Reading flash memory to file\n");
+        break;
+
+    case 'r':
+        val = strtol(arg, &endptr, 10);
+
+        if (arg == endptr) {
+            errno = EINVAL;
+        }
+
+        if (errno == EINVAL || errno == ERANGE) {
+            err = errno;
             break;
+        }
 
-        case 'f':
-            args.read = 1;
-            printf("Reading flash memory to file\n");
+        if (val < 0 || val > 15) {
+            printf("Number of retries must be between 0-15.\n");
+            err = EINVAL;
             break;
+        }
 
-        case 'r':
-            val = strtol(arg, &endptr, 10);
+        args.retries = val;
+        printf("Retries: %d\n", args.retries);
+        return 0;
 
-            if (arg == endptr)
-                errno = EINVAL;
+    case 'C':
+        val = strtol(arg, &endptr, 10);
 
-            if (errno == EINVAL || errno == ERANGE)
-            {
-                err = errno;
-                break;
-            }
+        if (arg == endptr) {
+            errno = EINVAL;
+        }
 
-            if (val < 0 || val > 15)
-            {
-                printf("Number of retries must be between 0-15.\n");
-                err = EINVAL;
-                break;
-            }
-
-            args.retries = val;
-            printf("Retries: %d\n", args.retries);
-            return 0;
-
-        case 'C':
-            val = strtol(arg, &endptr, 10);
-
-            if (arg == endptr)
-                errno = EINVAL;
-
-            if (errno == EINVAL || errno == ERANGE)
-            {
-                err = errno;
-                break;
-            }
-
-            args.DC = val;
-            printf("DC: pin %d\n", args.DC);
-            return 0;
-
-        case 'D':
-            val = strtol(arg, &endptr, 10);
-
-            if (arg == endptr)
-                errno = EINVAL;
-
-            if (errno == EINVAL || errno == ERANGE)
-            {
-                err = errno;
-                break;
-            }
-
-            args.DD = val;
-            printf("DD: pin %d\n", args.DD);
-            return 0;
-
-        case 'R':
-            val = strtol(arg, &endptr, 10);
-
-            if (arg == endptr)
-                errno = EINVAL;
-
-            if (errno == EINVAL || errno == ERANGE)
-            {
-                err = errno;
-                break;
-            }
-
-            args.RESET = val;
-            printf("RESET: pin %d\n", args.RESET);
-            return 0;
-
-        case ARGP_KEY_ARG:
-            if (args.fName)
-            {
-                err = EINVAL;
-                break;
-            }
-
-            args.fName = arg;
+        if (errno == EINVAL || errno == ERANGE) {
+            err = errno;
             break;
+        }
 
-        case ARGP_KEY_END:
-            if (args.fName == NULL)
-                argp_usage(state);
+        args.DC = val;
+        printf("DC: pin %d\n", args.DC);
+        return 0;
 
+    case 'D':
+        val = strtol(arg, &endptr, 10);
+
+        if (arg == endptr) {
+            errno = EINVAL;
+        }
+
+        if (errno == EINVAL || errno == ERANGE) {
+            err = errno;
             break;
+        }
 
-        default:
-            return ARGP_ERR_UNKNOWN;
+        args.DD = val;
+        printf("DD: pin %d\n", args.DD);
+        return 0;
+
+    case 'R':
+        val = strtol(arg, &endptr, 10);
+
+        if (arg == endptr) {
+            errno = EINVAL;
+        }
+
+        if (errno == EINVAL || errno == ERANGE) {
+            err = errno;
+            break;
+        }
+
+        args.RESET = val;
+        printf("RESET: pin %d\n", args.RESET);
+        return 0;
+
+    case ARGP_KEY_ARG:
+        if (args.fName) {
+            err = EINVAL;
+            break;
+        }
+
+        args.fName = arg;
+        break;
+
+    case ARGP_KEY_END:
+        if (args.fName == NULL) {
+            argp_usage(state);
+        }
+
+        break;
+
+    default:
+        return ARGP_ERR_UNKNOWN;
     }
 
-    if (err)
+    if (err) {
         argp_usage(state);
-    else
+    } else {
         return 0;
+    }
 }
 
-int read_chip(FILE *pFile)
+int read_chip(FILE * pFile)
 {
     unsigned char buffer[32767];
 
-    for (int i = 0; i < 8; i++)
-    {
+    for (int i = 0; i < 8; i++) {
         int read_count = read_flash_memory_block(1, i, 0, 32768, buffer);
         fwrite(buffer, 1, read_count, pFile);
 
-        if (read_count < 32768)
+        if (read_count < 32768) {
             return -1;
+        }
     }
 
     return 0;
 }
 
-int main(int argc, char **argv)
+int main(int argc, char ** argv)
 {
     unsigned char chip_id;
     unsigned char debug_config = 0x22;
     unsigned char Verify = 1;
     int readcount = 0;
     long fSize;
-    FILE *pFile;
-    struct argp_option options[] =
-    {
+    FILE * pFile;
+    struct argp_option options[] = {
         {
             .name = "flashread",
             .key = 'f',
@@ -867,8 +849,7 @@ int main(int argc, char **argv)
         },
         {0}
     };
-    struct argp argp =
-    {
+    struct argp argp = {
         .options = options,
         .parser = arg_parser,
         .args_doc = "[firmware.bin]",
@@ -878,42 +859,43 @@ int main(int argc, char **argv)
     argp_parse(&argp, argc, argv, 0, NULL, &args);
     pFile = fopen(args.fName, args.read ? "wb" : "rb");
 
-    if (!pFile)
-    {
+    if (!pFile) {
         perror("Unable to open file");
         return -1;
     }
 
     fseek(pFile, 0, SEEK_SET);
 
-    if (exportPin(args.DD))
+    if (exportPin(args.DD)) {
         return -1;
+    }
 
-    if (exportPin(args.DC))
+    if (exportPin(args.DC)) {
         return -1;
+    }
 
-    if (exportPin(args.RESET))
+    if (exportPin(args.RESET)) {
         return -1;
+    }
 
-    if (ProgrammerInit())
+    if (ProgrammerInit()) {
         return -1;
+    }
 
     debug_init();
     chip_id = read_chip_id();
 
-    if (chip_id == 0)
-    {
+    if (chip_id == 0) {
         fprintf(stderr, "Error: no chip detected.\n");
         return -1;
-    }
-    else
+    } else {
         printf("Chip ID = 0x%X\n", chip_id);
+    }
 
     RunDUP();
     debug_init();
 
-    if (args.read == 0)
-    {
+    if (args.read == 0) {
         fseek(pFile, 0, SEEK_END);
         fSize = ftell(pFile);
         fseek(pFile, 0, SEEK_SET);
@@ -941,13 +923,10 @@ int main(int argc, char **argv)
     // Enable DMA (Disable DMA_PAUSE bit in debug configuration)
     debug_command(CMD_WR_CONFIG, &debug_config, 1);
 
-    if (args.read)
-    {
+    if (args.read) {
         printf("Downloading chip...\n");
         read_chip(pFile);
-    }
-    else
-    {
+    } else {
         flash_chip(pFile, fSize, args.verify);
         RunDUP();
     }

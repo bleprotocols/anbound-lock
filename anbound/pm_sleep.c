@@ -6,9 +6,8 @@
 #define SLEEP_PM1          1 //PM1, 32.768 kHz oscillators on, voltage regulator on 
 #define SLEEP_PM2          2 //PM2, 32.768 kHz oscillators on, voltage regulator off
 #define SLEEP_PM3          3 //PM3, All clock oscillators off, voltage regulator off
-
 #define STIE_BV             0x20 //Sleep timer interrupt mask
-
+#define DISABLE_CALIBRATION_FLAG 0x80
 
 static void set_pcon()
 {
@@ -41,24 +40,22 @@ void pm_sleep(int drive_pins, uint32 milliseconds)
     uint8 p0sel, p1sel, p2sel;
     uint8 p0, p1, p2;
     uint8 clkon;
-    
-    sleepticks = (milliseconds << 12) /140; //small fudge factor due to our boards xosc being weird.  / 125 is appropriate if it's 32mhz;
-    SLEEP &= ~3;         /* clear mode bits */
-    SLEEP |= drive_pins ? SLEEP_PM1 : SLEEP_PM2; /* set mode bits   */
-    SLEEP |= 0x80; // disable calibration of 32khz timer
-    
+    sleepticks = (milliseconds << 12) / 140; //small fudge factor due to our boards xosc being weird.  / 125 is appropriate if it's 32mhz;
+    SLEEP &= ~3;       // clear mode bits
+    SLEEP |= drive_pins ? SLEEP_PM1 : SLEEP_PM2; // set mode bits
+    SLEEP |=  DISABLE_CALIBRATION_FLAG ; // disable calibration of 32khz timer
+
     while (!(STLOAD & 1));
 
     set_sleeptimer(sleepticks);
-    /* backup interrupt enable registers before sleep */
-    ien0  = IEN0;    /* backup IEN0 register */
-    ien1  = IEN1;    /* backup IEN1 register */
-    ien2  = IEN2;    /* backup IEN2 register */
+    // backup interrupt enable registers before sleep
+    ien0  = IEN0;    // backup IEN0 register
+    ien1  = IEN1;    // backup IEN1 register
+    ien2  = IEN2;    // backup IEN2 register
     clkon = CLKCON; //backup clock state
 
-    if (!drive_pins)
-    {
-        /* clear I/O registers before sleep */
+    if (!drive_pins) {
+        // clear I/O registers before sleep
         p0dir = P0DIR;
         p1dir = P1DIR;
         p2dir = P2DIR;
@@ -85,26 +82,23 @@ void pm_sleep(int drive_pins, uint32 milliseconds)
         P2SEL = 0;
     }
 
-    /* sleep timer interrupt control */
-    /* clear sleep interrupt flag */
+    // sleep timer interrupt control
+    // clear sleep interrupt flag
     STIF = 0;
-    /* enable sleep timer interrupt */
-    IEN0 = STIE_BV; /* disable IEN0 except STIE */
-    IEN1 = 0; /* disable IEN1 except P0IE */
-    IEN2 = 0; /* disable IEN2 except P1IE, P2IE */
+    // enable sleep timer interrupt
+    IEN0 = STIE_BV; // disable IEN0 except STIE
+    IEN1 = 0; // disable IEN1 except P0IE
+    IEN2 = 0; // disable IEN2 except P1IE, P2IE
     EA = 1; //enable interrupts
-    
     set_pcon();//go to sleep now
-    
     EA = 0; //disable interrupts
-    IEN0 = ien0;        /* restore IEN0 register */
-    IEN1 = ien1;        /* restore IEN1 register */
-    IEN2 = ien2;        /* restore IEN2 register */
-    IEN0 &= ~STIE_BV;   /* disable sleep int */
+    IEN0 = ien0;        // restore IEN0 register
+    IEN1 = ien1;        // restore IEN1 register
+    IEN2 = ien2;        // restore IEN2 register
+    IEN0 &= ~STIE_BV;   // disable sleep int
     CLKCON = clkon;
 
-    if (!drive_pins)
-    {
+    if (!drive_pins) {
         //restore registers
         P0DIR = p0dir;
         P1DIR = p1dir;
@@ -124,9 +118,9 @@ void pm_sleep(int drive_pins, uint32 milliseconds)
 }
 
 
-
+//clock interrupt, this is called when the timer expires
 ISR(ST, 0)
 {
-    STIF = 0;
+    STIF = 0; //continue with normal execution
 }
 

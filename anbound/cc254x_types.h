@@ -1,26 +1,15 @@
-/*! \file cc2511_types.h
+/*! \file cc254x_types.h
  * This file provides the definitions of useful data types.
  */
 
 #ifndef _TYPES_H
 #define _TYPES_H
 
-/** An unsigned 8-bit integer.  The range of this data type is 0 to 255. **/
 typedef unsigned char  uint8;
-
-/** A signed 8-bit integer.  The range of this data type is -128 to 127. **/
 typedef signed   char  int8;
-
-/** An unsigned 16-bit integer.  The range of this data type is 0 to 65,535. **/
 typedef unsigned short uint16;
-
-/** A signed 16-bit integer.  The range of this data type is -32,768 to 32,767. **/
 typedef signed   short int16;
-
-/** An unsigned 32-bit integer.  The range of this data type is 0 to 4,294,967,295. **/
 typedef unsigned long  uint32;
-
-/** A signed 32-bit integer.  The range of this data type is -2,147,483,648 to 2,147,483,647. **/
 typedef signed   long  int32;
 
 #ifdef SDCC

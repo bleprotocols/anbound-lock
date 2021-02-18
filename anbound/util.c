@@ -9,13 +9,15 @@ void isr_wdt() __interrupt(17) {}
 
 void slow_clockspeed()
 {
-    unsigned long int i=0;
+    unsigned long int i = 0;
     //switch to 32mhz crystal to stabilize 32khz xosc
-    CLKCON = (CLKCON & 0x80) ;    
-    while ( (CLKCONSTA & ~0x80) != 0 ); 
+    CLKCON = (CLKCON & 0x80) ;
+
+    while ( (CLKCONSTA & ~0x80) != 0 );
 
     //switch to 16mhz clock with divider to 250khz
-    CLKCON = (CLKCON & 0x80) | 0x49; 
+    CLKCON = (CLKCON & 0x80) | 0x49;
+
     while ((CLKCONSTA & ~0x80) != 0x49 );
 }
 
@@ -42,10 +44,8 @@ uint16 read_vdd()
 uint16 read_temperature()
 {
     uint16 ret = 0;
-    uint8 tr0;
-    uint8 atest;
-    tr0 = TR0; //save registers
-    atest = ATEST;
+    uint8 tr0 = TR0;//save registers
+    uint8 atest = ATEST;
     ATEST = 1; //enable the temperature sensor
     TR0 = 1; //connect temperature sensor to ADC
     ADCCON3 = 0x3E; //First 3 bits means the reference source is TEMP

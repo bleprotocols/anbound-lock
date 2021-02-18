@@ -1,11 +1,8 @@
 /*! \file cc2511_map.h
- * This header file provides access to the special registers on the CC2511F32, which
+ * This header file provides access to the special registers on the CC254x
  * allow direct manipulation of the chip's hardware.
  *
  * This file also provides macros for defining Interrupt Service Routines (ISRs).
- *
- * For documentation, see the
- * <a href="http://www.ti.com/product/CC2511">CC2511F32 datasheet</a>.
  */
 
 #ifndef _CC254X_MAP_H
@@ -55,18 +52,6 @@
  *    CPU time and you can guarantee that it is OK for the interrupt to
  *    modify those registers.
  *
- * Example ISR declaration (in a .h file):
-\code
-ISR(UTX1, 0);
-\endcode
- *
- * Example ISR definition (in a .c file):
-\code
-ISR(UTX1, 0)
-{
-    // code for handling event and clearing interrupt flag
-}
-\endcode
  */
 #define ISR(source, bank) void ISR_##source() __interrupt(source##_VECTOR) __using(bank)
 
@@ -304,44 +289,5 @@ SFRX(0x61A9, ATEST)
 
 #define USBCS0     USBCSIL
 #define USBCNT0    USBCNTL
-
-/*! Evaluates to the XDATA address of an SFR.
- *
- * Most of the internal SFRs are also part of the XDATA memory space,
- * which means you can have pointers to them of type
- * <code>uint8 XDATA *</code> and you can read or write to them using
- * DMA transfers.
- *
- * This macro does NOT work with the SFRs that are highlighted in gray
- * in Table 30 of the CC2511F32 datasheet (the "SFR Address Overview"
- * table). */
-#define XDATA_SFR_ADDRESS(sfr) (0x6300 + ((unsigned int)&(sfr))) /* NOT SURE */
-
-/*! This struct represents the configuration of a single DMA channel.
- * See the "DMA Controller" section of the CC2511F32 datasheet
- * for information on how to use this struct and DMA in general.
- *
- * Also see dma.h.
- *
- * NOTE: You won't find DC6 or DC7 in the datasheet, the names of
- * those bytes were invented for this struct. */
-typedef struct
-{
-    unsigned char SRCADDRH;
-    unsigned char SRCADDRL;
-    unsigned char DESTADDRH;
-    unsigned char DESTADDRL;
-
-    /*! Bits 7:5 are VLEN, bits 4:0 are LEN[12:8] */
-    unsigned char VLEN_LENH;
-    unsigned char LENL;
-
-    /*! Bit 7 is WORDSIZE, Bits 6:5 are TMODE, Bits 4:0 are TRIG. */
-    unsigned char DC6;
-
-    /*! Bits 7:6 are SRCINC, 5:4 are DESTINC, 3 is IRQMASK, 2 is M8, 1:0 are PRIORITY. */
-    unsigned char DC7;
-} DMA_CONFIG;
-
 
 #endif
