@@ -141,7 +141,7 @@ void sleep_minutes(const unsigned long int minutes) {
     unsigned int n;
     for (i = 0; i < minutes; i++) {
         for(n=0;n<6;n++){
-          pm_sleep(0,8700);
+          pm_sleep(0,9910);
           if (!shackle_closed() && !shackle_closed() && !shackle_closed()) return;
         }
 

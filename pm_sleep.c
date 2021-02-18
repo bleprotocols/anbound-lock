@@ -42,7 +42,7 @@ void pm_sleep(int drive_pins, uint32 milliseconds)
     uint8 p0, p1, p2;
     uint8 clkon;
     
-    sleepticks = (milliseconds << 12) / 125;
+    sleepticks = (milliseconds << 12) /150; //small fudge factor due to our boards xosc being weird.  / 125 is appropriate if it's 32mhz;
     SLEEP &= ~3;         /* clear mode bits */
     SLEEP |= drive_pins ? SLEEP_PM1 : SLEEP_PM2; /* set mode bits   */
     SLEEP |= 0x80; // disable calibration of 32khz timer
