@@ -7,7 +7,8 @@
 #include "output.h"
 
 #define OPEN_RETRIES 50
-
+//3 months in hours
+#define MAX_LOCKMINS 0x20B20
 
 int16 input_count(const uint16 led)
 {
@@ -66,14 +67,19 @@ void safe_open_lock()
     }
 }
 
+int safe_to_lock(uint32 minutes)
+{
+    return ((MAX_LOCKMINS * battery_soc() ) / 100) >= minutes;
+}
+
 int main(void)
 {
     uint32 minutes = 0;
     uint32 hours = 0;
     uint32 days = 0;
     int is_random = 0;
-    //slow down our device
     open_lock();
+    //slow down our device
     slow_clockspeed();
 
     while (1) {
@@ -95,17 +101,19 @@ int main(void)
                     minutes += hours * 60;
                     minutes += days * 60 * 24;
 
-                    if (is_random) {
-                        minutes = rnd32() % ( minutes + 1 );
-                    }
+                    if ( safe_to_lock(minutes) ) {
+                        if (is_random) {
+                            minutes = rnd32() % ( minutes + 1 );
+                        }
 
-                    close_lock();
-                    sleep_minutes(minutes, days > 0);
-                    days = 0;
-                    hours = 0
-                            minutes = 0;
-                    is_random = 0;
-                    safe_open_lock();
+                        close_lock();
+                        sleep_minutes(minutes, minutes > 120);
+                        days = 0;
+                        hours = 0;
+                        minutes = 0;
+                        is_random = 0;
+                        safe_open_lock();
+                    }
                 }
             } else {
                 is_random = flash_leds();

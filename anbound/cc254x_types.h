@@ -11,7 +11,7 @@ typedef unsigned short uint16;
 typedef signed   short int16;
 typedef unsigned long  uint32;
 typedef signed   long  int32;
-
+typedef unsigned char bool;
 #ifdef SDCC
 
 /** A 1-bit value that is stored in the processor's bit-addressable memory region.

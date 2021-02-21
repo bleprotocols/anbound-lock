@@ -31,5 +31,6 @@ The total time is days+hours+minutes.
 
 After the lights turn off, close the shackle and press the button. The led will flash in red one time for each hour you set - and in blue one time for each 10 minutes you set, and in red+blue for each day you set.
 After this the lights will blink rapidly for a few seconds if the random mode is enabled. If the time was mistaken - you can now still open the lock. Once you hear the lock click it is closed and all you can do is wait until it opens again.
+When the lock is locked, and the timer is < 120 minutes, the lock will blink once every minute.
 
 Notice: this is free software. Covered by the GPL. You are free to use it as you see fit, free to modify it as you see fit, and sell it as you see fit. Anyone who thinks otherwise can kiss my ass.

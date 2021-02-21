@@ -57,7 +57,7 @@ int flash_leds()
     int ret = button_pressed();
 
     for (i = 0; i < 70; i++) {
-        ret |= button_pressed();
+        ret &= button_pressed();
 
         switch (i % 5) {
         case 0:
