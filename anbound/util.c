@@ -30,6 +30,11 @@ uint16 rnd()
 }
 
 
+uint32 rnd32()
+{
+    return ((uint32)rnd()) << 16 | rnd();
+}
+
 
 uint16 read_vdd()
 {

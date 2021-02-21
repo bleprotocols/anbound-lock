@@ -32,7 +32,7 @@ int16 input_count(const uint16 led)
 }
 
 
-void sleep_minutes(const uint32 minutes)
+void sleep_minutes(const uint32 minutes, const uint8 do_blink)
 {
     uint32 i = 0;
     unsigned int n;
@@ -46,7 +46,9 @@ void sleep_minutes(const uint32 minutes)
             }
         }
 
-        blink(MINUTE_LED, 1);
+        if (do_blink) {
+            blink(MINUTE_LED, 1);
+        }
     }
 }
 
@@ -68,6 +70,8 @@ int main(void)
 {
     uint32 minutes = 0;
     uint32 hours = 0;
+    uint32 days = 0;
+    int is_random = 0;
     //slow down our device
     open_lock();
     slow_clockspeed();
@@ -76,28 +80,39 @@ int main(void)
         if (button_pressed()) {
             if (shackle_closed()) {
                 open_lock();
-                pm_sleep(0, 1000);
+                pm_sleep(0, 2000);
                 blink(MINUTE_LED, minutes);
                 blink(HOUR_LED, hours);
-                pm_sleep(0, 2000);
-                flash_leds();
+                blink(DAY_LED, days);
+                pm_sleep(0, 4000);
+
+                if (is_random) {
+                    flash_leds();
+                }
 
                 if (shackle_closed()) {
+                    minutes *= 10;
+                    minutes += hours * 60;
+                    minutes += days * 60 * 24;
+
+                    if (is_random) {
+                        minutes = rnd32() % ( minutes + 1 );
+                    }
+
                     close_lock();
-                    sleep_minutes(minutes * 10);
-                    sleep_minutes(hours * 60);
-                    minutes = 0;
-                    hours = 0;
+                    sleep_minutes(minutes, days > 0);
+                    days = 0;
+                    hours = 0
+                            minutes = 0;
+                    is_random = 0;
                     safe_open_lock();
                 }
             } else {
-                led_on(HOUR_LED);
-                led_on(MINUTE_LED);
-                pm_sleep(1, 2000);
-                led_off(HOUR_LED);
-                led_off(MINUTE_LED);
+                is_random = flash_leds();
+                pm_sleep(0, 3000);
                 minutes = input_count(MINUTE_LED);
                 hours = input_count(HOUR_LED);
+                days = input_count(DAY_LED);
             }
         }
 

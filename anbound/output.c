@@ -2,6 +2,7 @@
 #include "cc254x_map.h"
 #include "pm_sleep.h"
 #include "output.h"
+#include "input.h"
 
 //REGISTER 1  bit 0x1 is the actuator to open the lock.
 void open_lock()
@@ -50,11 +51,14 @@ void blink(const uint16 led, const uint16 count)
     }
 }
 
-void flash_leds()
+int flash_leds()
 {
     uint16 i = 0;
+    int ret = button_pressed();
 
     for (i = 0; i < 70; i++) {
+        ret != button_pressed();
+
         switch (i % 5) {
         case 0:
             led_on(HOUR_LED);
@@ -78,4 +82,5 @@ void flash_leds()
 
     led_off(HOUR_LED);
     led_off(MINUTE_LED);
+    return ret;
 }
