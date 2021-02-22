@@ -125,5 +125,6 @@ int main(void)
         }
 
         pm_sleep(0, 1000);
+        rnd();//seed RNG with tick count
     }
 }
