@@ -107,7 +107,7 @@ int main(void)
                         }
 
                         close_lock();
-                        sleep_minutes(minutes, minutes > 120);
+                        sleep_minutes(minutes, minutes < 120);
                         days = 0;
                         hours = 0;
                         minutes = 0;
