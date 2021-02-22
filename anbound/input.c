@@ -7,9 +7,6 @@
     REGINP |= PIN;\
     REG |= PIN;\
     NOOP;\
-    NOOP;\
-    NOOP;\
-    NOOP;\
     OUT = !(REG & PIN);\
     REG &= ~PIN;\
     REGINP &= ~PIN;\

@@ -41,10 +41,6 @@ void sleep_minutes(const uint32 minutes, const uint8 do_blink)
     for (i = 0; i < minutes; i++) {
         for (n = 0; n < 6; n++) {
             pm_sleep(0, 9910);
-
-            if (!shackle_closed() && !shackle_closed() && !shackle_closed()) {
-                return;
-            }
         }
 
         if (do_blink) {
