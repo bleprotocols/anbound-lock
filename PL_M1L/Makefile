@@ -21,4 +21,4 @@ clean:
 	rm  *.asm *.hex *.lst *.map *.mem *.rel *.lk *.rst *.sym *.adb *.cdb *.omf -f
 
 all: ${LIBS} ${BIN}
-	cp ${BIN} ../binary_firmware/anbound_timer_lock.bin
+	cp ${BIN} ../binary_firmware/mini_timer_lock.bin

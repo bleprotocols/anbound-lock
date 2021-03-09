@@ -1,6 +1,7 @@
-#include "cc254x_types.h"
-#include "cc254x_map.h"
-#include "pm_sleep.h"
+#include "../common/cc254x_types.h"
+#include "../common/cc254x_map.h"
+#include "../common/util.h"
+#include "../common/pm_sleep.h"
 #include "output.h"
 #include "input.h"
 

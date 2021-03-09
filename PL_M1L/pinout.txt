@@ -1,0 +1,4 @@
+3.3v and gnd are on the battery terminal
+J7 = Rst = pin 26 on the pi
+J6 = DD = pin 20 on the pi
+J5 = DC = pin 21 on the pi

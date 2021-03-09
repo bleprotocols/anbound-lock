@@ -5,7 +5,7 @@
 #define MINUTE_LED 0x20
 #define DAY_LED HOUR_LED|MINUTE_LED
 
-#include "cc254x_types.h"
+#include "../common/cc254x_types.h"
 
 void open_lock();
 void close_lock();

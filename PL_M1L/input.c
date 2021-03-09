@@ -8,7 +8,7 @@
     REGINP |= PIN;\
     REG |= PIN;\
     NOOP;\
-    OUT = !(REG & PIN);\
+    OUT = (REG & PIN);\
     REG &= ~PIN;\
     REGINP &= ~PIN;\
 
@@ -18,14 +18,19 @@
 int shackle_closed()
 {
     int ret = 0;
-    POLL_INPUT(P0, P0INP, 0x1, ret);
-    return ret;
+    POLL_INPUT(P1, P1INP, 0x40, ret);
+    return ret == 0;
 }
 
 //REGISTER 1 BIT 0X10 contains the lock's button state. It's pull-down, so when the button is pressed the pin is low.
+//button 2 is up,
+//button 4 is right
+//button 8 is left
+//button 16 is center
+//button 32 is down
 int button_pressed()
 {
     int ret = 0;
-    POLL_INPUT(P1, P1INP, 0x10, ret);
-    return ret;
+    POLL_INPUT(P0, P0INP, 0x10, ret);
+    return ret == 0;
 }

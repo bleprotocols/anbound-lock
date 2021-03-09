@@ -6,10 +6,10 @@
 #include "output.h"
 
 #define OPEN_RETRIES 50
-//3 months in hours
-#define MAX_LOCKMINS 0x20B20
+//3 weeks in hours
+#define MAX_LOCKMINS 0x7620
 
-int16 input_count(const uint16 led)
+int16 input_count(const uint8 led)
 {
     int16 ret = 0;
     uint16 last_pressed = 0;
@@ -18,7 +18,7 @@ int16 input_count(const uint16 led)
 
     for (i = 0; last_pressed < 30; last_pressed++) {
         if (button_pressed()) {
-            blink(led, 1);
+            blink(led, 1, 0);
             led_on(led);
             ret++;
             last_pressed = 0;
@@ -43,7 +43,7 @@ void sleep_minutes(const uint32 minutes, const uint8 do_blink)
         }
 
         if (do_blink) {
-            blink(MINUTE_LED, 1);
+            blink(MINUTE_LED, 1, 0);
         }
     }
 }
@@ -73,18 +73,18 @@ int main(void)
     uint32 hours = 0;
     uint32 days = 0;
     int is_random = 0;
-    open_lock();
     //slow down our device
     slow_clockspeed();
+    open_lock();
 
     while (1) {
         if (button_pressed()) {
             if (shackle_closed()) {
                 open_lock();
                 pm_sleep(0, 2000);
-                blink(MINUTE_LED, minutes);
-                blink(HOUR_LED, hours);
-                blink(DAY_LED, days);
+                blink(MINUTE_LED, minutes, 1);
+                blink(HOUR_LED, hours, 1);
+                blink(DAY_LED, days, 1);
                 pm_sleep(0, 4000);
 
                 if (is_random) {
@@ -102,7 +102,7 @@ int main(void)
                         }
 
                         close_lock();
-                        sleep_minutes(minutes, minutes < 120);
+                        sleep_minutes(minutes, minutes < 120 ? 1 : 0);
                         days = 0;
                         hours = 0;
                         minutes = 0;
@@ -114,7 +114,9 @@ int main(void)
                 is_random = flash_leds();
                 pm_sleep(0, 3000);
                 minutes = input_count(MINUTE_LED);
+                pm_sleep(0, 1000);
                 hours = input_count(HOUR_LED);
+                pm_sleep(0, 1000);
                 days = input_count(DAY_LED);
             }
         }

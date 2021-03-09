@@ -1,3 +1,6 @@
+#ifndef _UTIL_H
+#define _UTIL_H
+
 #include "cc254x_types.h"
 
 /* even if we don't use this interrupt, make sure we have a vector for it
@@ -11,3 +14,6 @@ uint16 read_vdd(); //Read the device input voltage
 uint16 battery_soc();//read battery state of charge
 uint16 read_temperature(); //Read the chip temperature sensor
 void slow_clockspeed();//set the clockspeed to the slowest option/divider
+#define NOOP __asm nop __endasm;
+
+#endif
