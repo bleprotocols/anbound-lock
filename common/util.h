@@ -14,6 +14,7 @@ uint16 read_vdd(); //Read the device input voltage
 uint16 battery_soc();//read battery state of charge
 uint16 read_temperature(); //Read the chip temperature sensor
 void slow_clockspeed();//set the clockspeed to the slowest option/divider
+void pwm_motor(const uint8 pin); //pwm an output pin
 #define NOOP __asm nop __endasm;
 
 #endif
