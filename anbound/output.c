@@ -8,21 +8,13 @@
 //REGISTER 1  bit 0x1 is the actuator to open the lock.
 void open_lock()
 {
-    P1DIR |= 1;
-    P1 |= 1;
-    pm_sleep(1, 50);
-    P1 &= ~1;
-    P1DIR &= ~1;
+    pwm_motor(1);
 }
 
 //register 1 bit 0x02 is the actuator to close the lock
 void close_lock()
 {
-    P1DIR |= 2;
-    P1 |= 2;
-    pm_sleep(1, 50);
-    P1 &= ~2;
-    P1DIR &= ~2;
+    pwm_motor(2);
 }
 
 void led_on(const uint16 led)
