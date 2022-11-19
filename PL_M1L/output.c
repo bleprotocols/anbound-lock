@@ -5,41 +5,6 @@
 #include "output.h"
 #include "input.h"
 
-//REGISTER 1  bit 0x1 is the actuator to open the lock.
-void pwm_motor(const uint8 pin)
-{
-    const uint8 pwm_on = 1;
-    const uint8 pwm_off = 15;
-    const uint32 iter = 100000;
-    uint32 i = 0;
-    uint8 n = 0;
-    //make our clock fast enough for pwm use
-    CLKCON = (CLKCON & 0x80) ;
-
-    while ( (CLKCONSTA & ~0x80) != 0 );
-
-    P1DIR |= pin;
-
-    for (i = 0; i < iter; i++) {
-        P1 |= pin;
-
-        for (n = 0; n < pwm_on; n++) {
-            NOOP;
-        }
-
-        P1 &= ~pin;
-
-        for (n = 0; n < pwm_off; n++) {
-            NOOP;
-        }
-    }
-
-    //slow our clock to 250khz again
-    CLKCON = (CLKCON & 0x80) | 0x49;
-
-    while ((CLKCONSTA & ~0x80) != 0x49 );
-}
-
 void open_lock()
 {
     pwm_motor(1);
