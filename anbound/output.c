@@ -8,13 +8,13 @@
 //REGISTER 1  bit 0x1 is the actuator to open the lock.
 void open_lock()
 {
-    pwm_motor(1);
+    pwm_motor(1,15,1);
 }
 
 //register 1 bit 0x02 is the actuator to close the lock
 void close_lock()
 {
-    pwm_motor(2);
+    pwm_motor(2,15,10);
 }
 
 void led_on(const uint16 led)
