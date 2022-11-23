@@ -92,10 +92,8 @@ uint16 read_temperature()
     return ret;
 }
 
-void pwm_motor(const uint8 pin)
+void pwm_motor(const uint8 pin, const uint8 pwm_on,const uint8 pwm_off)
 {
-    const uint8 pwm_on = 7;
-    const uint8 pwm_off = 15;
     const uint32 iter = 100000;
     uint32 i = 0;
     uint8 n = 0;
