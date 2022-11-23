@@ -7,12 +7,12 @@
 
 void open_lock()
 {
-    pwm_motor(1);
+    pwm_motor(1,2,15);
 }
 //register 1 bit 0x02 is the actuator to close the lock
 void close_lock()
 {
-    pwm_motor(2);
+    pwm_motor(2,2,15);
 }
 
 void led_on(const uint16 led)
