@@ -15,6 +15,8 @@ void open_lock()
 void close_lock()
 {
     pwm_motor(2,15,1);
+    pm_sleep(0, 5000);
+    pwm_motor(2,15,1);
 }
 
 void led_on(const uint16 led)
